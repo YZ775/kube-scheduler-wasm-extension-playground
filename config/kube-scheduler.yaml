@@ -1,0 +1,11 @@
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+profiles:
+- plugins:
+    multiPoint:
+      enabled:
+        - name: wasmplugin1
+  pluginConfig:
+    - name: wasmplugin1
+      args:
+        guestURL: "file://main.wasm"
