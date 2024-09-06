@@ -1,0 +1,34 @@
+kind: KubeSchedulerConfiguration
+apiVersion: kubescheduler.config.k8s.io/v1
+clientConnection:
+  kubeconfig: ./e2e/kubeconfig.yaml
+enableProfiling: true
+enableContentionProfiling: true
+percentageOfNodesToScore: 0
+podInitialBackoffSeconds: 1
+podMaxBackoffSeconds: 10
+profiles:
+- schedulerName: default-scheduler
+  plugins:
+    score:
+      disabled:
+      - name: PodTopologySpread
+      - name: SelectorSpread
+      enabled:
+      - name: PodTopologySpread
+        weight: 500
+    multiPoint:
+      enabled:
+        - name: wasmplugin1
+  pluginConfig:
+  - name: PodTopologySpread
+    args:
+      # https://pkg.go.dev/k8s.io/kube-scheduler/config/v1#PodTopologySpreadArgs
+      defaultConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
+      defaultingType: List
+  - name: wasmplugin1
+    args:
+      guestURL: "file://bin/main.wasm"
