@@ -1,7 +1,7 @@
 kind: KubeSchedulerConfiguration
 apiVersion: kubescheduler.config.k8s.io/v1
 clientConnection:
-  kubeconfig: ./e2e/kubeconfig.yaml
+  kubeconfig: ./simulator-config/kubeconfig.yaml
 enableProfiling: true
 enableContentionProfiling: true
 percentageOfNodesToScore: 0

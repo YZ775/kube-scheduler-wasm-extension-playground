@@ -11,7 +11,7 @@ build-kube-scheduler:
 
 .PHONY start-kind:
 start-kind:
-	kind create cluster --config config/kind-config.yaml
+	kind create cluster --config kind-config/kind-config.yaml
 
 .PHONY deploy-kube-scheduler:
 deploy-kube-scheduler:
@@ -23,25 +23,24 @@ deploy-kube-scheduler:
 exec-control-plane:
 	docker exec -it kind-control-plane /bin/bash
 
-.PHONY run-kube-scheduler:
-run-kube-scheduler:
+.PHONY run-kube-scheduler-kind:
+run-kube-scheduler-kind:
 	docker exec -it kind-control-plane ./kube-scheduler --config=kube-scheduler.yaml --authentication-kubeconfig=/etc/kubernetes/scheduler.conf --authorization-kubeconfig=/etc/kubernetes/scheduler.conf --bind-address=127.0.0.1 --master=--authentication-kubeconfig=/etc/kubernetes/scheduler.conf--authorization-kubeconfig=/etc/kubernetes/scheduler.conf--bind-address=127.0.0.1--kubeconfig=/etc/kubernetes/scheduler.conf--leader-elect=true --secure-port=10200 --leader-elect=true --master=https://172.18.0.3:6443
-
-
-
 
 .PHONY setup-simulator:
 setup-simulator:
 	mkdir -p download
-	cd download && git clone git@github.com:kubernetes-sigs/kube-scheduler-simulator.git
+	cd download && git clone -b simulator/v0.3.0 git@github.com:kubernetes-sigs/kube-scheduler-simulator.git
 	yq -i '.externalSchedulerEnabled |= true'  download/kube-scheduler-simulator/simulator/config.yaml
-	sed -i '' 's/1212/1213/g'  download/kube-scheduler-simulator/simulator/config.yaml
-	sed -i '' 's/1212/1213/g' download/kube-scheduler-simulator/docker-compose.yml
-
+	sed -i '' 's/v0.2.0/v0.3.0/g'  download/kube-scheduler-simulator/docker-compose.yml
 
 .PHONY run-simulator:
 run-simulator: $(SCHEDULER)
 	cd download/kube-scheduler-simulator && make docker_up
+
+.PHONY run-scheduler:
+run-scheduler:
+	./bin/kube-scheduler --config=simulator-config/schedulerconfig.yaml
 
 .PHONY build-wasm:
 build-wasm:
